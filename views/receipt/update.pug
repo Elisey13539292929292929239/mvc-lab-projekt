@@ -1,0 +1,59 @@
+doctype html
+html(lang="en")
+  head
+    title Create a new recipe
+    style.
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 400px;
+        margin: 20px 0;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      input[type='text'],
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+  body
+    h1 Creating a new recipe
+
+    form(action='/receipts', method='POST')
+      label(for='name') Name:
+      input(type='text', id='name', name='name')
+
+      label(for='description') Description:
+      textarea(id='description', name='description')
+
+      label(for='receipt') Receipt:
+      input(type='text', id='receipt', name='receipt')
+
+      button(type='submit') Create

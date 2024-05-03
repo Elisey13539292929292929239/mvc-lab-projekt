@@ -1,0 +1,61 @@
+doctype html
+html
+  head
+    title Registration
+    style.
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      form {
+        max-width: 300px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box; // Ensures padding doesn't affect overall width
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+  body
+    h1 Register
+    form(action="/register", method="POST")
+      label(for="username") Username:
+      input(type="text", id="username", name="username", required)
+      br
+      label(for="password") Password:
+      input(type="password", id="password", name="password", required)
+      br
+      label(for="confirmPassword") Confirm Password:
+      input(type="password", id="confirmPassword", name="confirmPassword", required)
+      br
+      button(type="submit") Register

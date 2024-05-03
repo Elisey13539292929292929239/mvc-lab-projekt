@@ -1,0 +1,37 @@
+doctype html
+html(lang="en")
+  head
+    title Personal Dashboard
+    style.
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      p {
+        color: #666;
+      }
+      a {
+        display: inline-block;
+        margin: 10px 0;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      a:hover {
+        background-color: #0056b3;
+      }
+  body
+    h1 Welcome to the Personal Dashboard!
+    p Here you can manage your account.
+    a(href='/receipts/new') Create new recipe
+    br
+    a(href='/receipts') View all recipes
+    br
+    a(href='/logout') Logout
