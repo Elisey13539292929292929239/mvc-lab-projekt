@@ -9,16 +9,15 @@ const Comment = require('../models/Comment.js')
 const app = express()
 
 
-
 class receiptController {
-  // Отображение списка всех рецептов
+  // Display the list of all receipts
   async index(req, res) {
     try {
       const receipts = await Receipt.find();
-       res.render('receipt/index', { receipts }); 
+      res.render('receipt/index', { receipts });
     } catch (error) {
-      console.error('Ошибка при получении списка рецептов:', error);
-      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
+      console.error('Error retrieving the list of receipts:', error);
+      res.status(500).send('Something went wrong. Please try again.');
     }
   }
 
@@ -26,54 +25,54 @@ class receiptController {
     res.render('receipt/add')
   }
 
-  // Создание нового рецепта
+  // Creating a new receipt
   async create(req, res) {
     const { name, description, receipt } = req.body;
     console.log(req.session.userId)
     //const author = req.session.userId.toString()
 
-    const author = await User.findOne({name:req.session.name})
-    
+    const author = await User.findOne({ name: req.session.name })
+
 
     try {
       const newReceipt = new Receipt({ name, description, author: author, receipt });
       await newReceipt.save();
-      res.status(201).send('Рецепт успешно создан!');
+      res.status(201).send('Receipt successfully created!');
     } catch (error) {
-      console.error('Ошибка при создании рецепта:', error);
-      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
+      console.error('Error creating receipt:', error);
+      res.status(500).send('Something went wrong. Please try again.');
     }
   }
 
-  // Получение конкретного рецепта по ID
+  // Retrieving a specific receipt by ID
   async show(req, res) {
     const { id } = req.params;
 
 
     try {
       const receipt = await Receipt.findById(id);
-      const comments = await Comment.find({receiptId: id})
+      const comments = await Comment.find({ receiptId: id })
       console.log(comments.length)
       if (!receipt) {
-        return res.status(404).send('Рецепт не найден.');
+        return res.status(404).send('Receipt not found.');
       }
-      res.render('receipt/read', { receipt, comments }); 
+      res.render('receipt/read', { receipt, comments });
     } catch (error) {
-      console.error('Ошибка при получении рецепта:', error);
-      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
+      console.error('Error retrieving receipt:', error);
+      res.status(500).send('Something went wrong. Please try again.');
     }
   }
 
   async editForm(req, res) {
-    const {id} = req.params
+    const { id } = req.params
     const receiptData = Receipt.findById(id)
     if (!receiptData) {
-        return res.status(404).send('Рецепт не найден.');
-      }
-    res.render('receipt/update', {receipt: receiptData})
+      return res.status(404).send('Receipt not found.');
+    }
+    res.render('receipt/update', { receipt: receiptData })
   }
 
-  // Обновление рецепта
+  // Updating a receipt
   async update(req, res) {
     const { id } = req.params;
     const { name, description, author, receipt } = req.body;
@@ -81,64 +80,64 @@ class receiptController {
     try {
       const updatedReceipt = await Receipt.findByIdAndUpdate(id, { name, description, author, receipt }, { new: true });
       if (!updatedReceipt) {
-        return res.status(404).send('Рецепт не найден.');
+        return res.status(404).send('Receipt not found.');
       }
-      res.status(200).send('Рецепт успешно обновлен!');
+      res.status(200).send('Receipt successfully updated!');
     } catch (error) {
-      console.error('Ошибка при обновлении рецепта:', error);
-      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
+      console.error('Error updating receipt:', error);
+      res.status(500).send('Something went wrong. Please try again.');
     }
   }
 
-  // Удаление рецепта
+  // Deleting a receipt
   async delete(req, res) {
     const { id } = req.params;
 
     try {
       const deletedReceipt = await Receipt.findByIdAndDelete(id);
       if (!deletedReceipt) {
-        return res.status(404).send('Рецепт не найден.');
+        return res.status(404).send('Receipt not found.');
       }
-      res.status(200).send('Рецепт успешно удален!');
+      res.status(200).send('Receipt successfully deleted!');
     } catch (error) {
-      console.error('Ошибка при удалении рецепта:', error);
-      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
+      console.error('Error deleting receipt:', error);
+      res.status(500).send('Something went wrong. Please try again.');
     }
   }
 
   async like(req, res) {
-     try {
-    // Проверяем, существует ли уже лайк от текущего пользователя для данного рецепта
-    const existingLike = await Like.findOne({ userId: req.userId, receiptId: req.body.receiptId });
+    try {
+      // Checking if a like by the current user for this receipt already exists
+      const existingLike = await Like.findOne({ userId: req.userId, receiptId: req.body.receiptId });
 
-    if (existingLike) {
-      // Если лайк уже существует, возвращаем ошибку
-      return res.status(400).json({ message: 'Лайк уже добавлен' });
+      if (existingLike) {
+        // If a like already exists, return an error
+        return res.status(400).json({ message: 'Like already added' });
+      }
+
+      const user = await User.findOne({ name: req.session.name })
+
+      // Creating a new like
+      const like = new Like({
+        userId: user,
+        receiptId: req.body.receiptId
+      });
+
+      // Saving the like in the database
+      await like.save();
+
+      res.status(201).json({ message: 'Like successfully added' });
+    } catch (error) {
+      console.error('Error adding like:', error);
+      res.status(500).json({ message: 'Something went wrong. Please try again.' });
     }
-
-    const user = await User.findOne({name: req.session.name})
-
-    // Создаем новый лайк
-    const like = new Like({
-      userId: user,
-      receiptId: req.body.receiptId
-    });
-
-    // Сохраняем лайк в базе данных
-    await like.save();
-
-    res.status(201).json({ message: 'Лайк успешно добавлен' });
-  } catch (error) {
-    console.error('Ошибка при добавлении лайка:', error);
-    res.status(500).json({ message: 'Что-то пошло не так. Пожалуйста, попробуйте снова.' });
-  }
   }
 
   async comment(req, res) {
-    const {id, comment} = req.body
+    const { id, comment } = req.body
     console.log(req.body)
 
-    const user = await User.findOne({name: req.session.name})
+    const user = await User.findOne({ name: req.session.name })
 
     const comment_r = new Comment({
       comment: comment,
@@ -147,7 +146,7 @@ class receiptController {
     })
 
     await comment_r.save()
-    res.status(200).json({message:'Комментарий успешно добавлен'})
+    res.status(200).json({ message: 'Comment successfully added' })
   }
 }
 
