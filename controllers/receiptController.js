@@ -9,15 +9,16 @@ const Comment = require('../models/Comment.js')
 const app = express()
 
 
+
 class receiptController {
-  // Display the list of all receipts
+  // Отображение списка всех рецептов
   async index(req, res) {
     try {
       const receipts = await Receipt.find();
-      res.render('receipt/index', { receipts });
+      res.render('receipt/index', { receipts, current: req.session.userId });
     } catch (error) {
-      console.error('Error retrieving the list of receipts:', error);
-      res.status(500).send('Something went wrong. Please try again.');
+      console.error('Ошибка при получении списка рецептов:', error);
+      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
     }
   }
 
@@ -25,7 +26,7 @@ class receiptController {
     res.render('receipt/add')
   }
 
-  // Creating a new receipt
+  // Создание нового рецепта
   async create(req, res) {
     const { name, description, receipt } = req.body;
     console.log(req.session.userId)
@@ -37,14 +38,14 @@ class receiptController {
     try {
       const newReceipt = new Receipt({ name, description, author: author, receipt });
       await newReceipt.save();
-      res.status(201).send('Receipt successfully created!');
+      res.status(201).send('Рецепт успешно создан!');
     } catch (error) {
-      console.error('Error creating receipt:', error);
-      res.status(500).send('Something went wrong. Please try again.');
+      console.error('Ошибка при создании рецепта:', error);
+      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
     }
   }
 
-  // Retrieving a specific receipt by ID
+  // Получение конкретного рецепта по ID
   async show(req, res) {
     const { id } = req.params;
 
@@ -54,25 +55,26 @@ class receiptController {
       const comments = await Comment.find({ receiptId: id })
       console.log(comments.length)
       if (!receipt) {
-        return res.status(404).send('Receipt not found.');
+        return res.status(404).send('Рецепт не найден.');
       }
       res.render('receipt/read', { receipt, comments });
     } catch (error) {
-      console.error('Error retrieving receipt:', error);
-      res.status(500).send('Something went wrong. Please try again.');
+      console.error('Ошибка при получении рецепта:', error);
+      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
     }
   }
 
   async editForm(req, res) {
     const { id } = req.params
-    const receiptData = Receipt.findById(id)
-    if (!receiptData) {
-      return res.status(404).send('Receipt not found.');
+    const receipt = await Receipt.findById(id)
+    console.log(receipt)
+    if (!receipt) {
+      return res.status(404).send('Рецепт не найден.');
     }
-    res.render('receipt/update', { receipt: receiptData })
+    res.render('receipt/update', { receipt: receipt })
   }
 
-  // Updating a receipt
+  // Обновление рецепта
   async update(req, res) {
     const { id } = req.params;
     const { name, description, author, receipt } = req.body;
@@ -80,56 +82,56 @@ class receiptController {
     try {
       const updatedReceipt = await Receipt.findByIdAndUpdate(id, { name, description, author, receipt }, { new: true });
       if (!updatedReceipt) {
-        return res.status(404).send('Receipt not found.');
+        return res.status(404).send('Рецепт не найден.');
       }
-      res.status(200).send('Receipt successfully updated!');
+      res.status(200).send('Рецепт успешно обновлен!');
     } catch (error) {
-      console.error('Error updating receipt:', error);
-      res.status(500).send('Something went wrong. Please try again.');
+      console.error('Ошибка при обновлении рецепта:', error);
+      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
     }
   }
 
-  // Deleting a receipt
+  // Удаление рецепта
   async delete(req, res) {
     const { id } = req.params;
 
     try {
       const deletedReceipt = await Receipt.findByIdAndDelete(id);
       if (!deletedReceipt) {
-        return res.status(404).send('Receipt not found.');
+        return res.status(404).send('Рецепт не найден.');
       }
-      res.status(200).send('Receipt successfully deleted!');
+      res.status(200).send('Рецепт успешно удален!');
     } catch (error) {
-      console.error('Error deleting receipt:', error);
-      res.status(500).send('Something went wrong. Please try again.');
+      console.error('Ошибка при удалении рецепта:', error);
+      res.status(500).send('Что-то пошло не так. Пожалуйста, попробуйте снова.');
     }
   }
 
   async like(req, res) {
     try {
-      // Checking if a like by the current user for this receipt already exists
+      // Проверяем, существует ли уже лайк от текущего пользователя для данного рецепта
       const existingLike = await Like.findOne({ userId: req.userId, receiptId: req.body.receiptId });
 
       if (existingLike) {
-        // If a like already exists, return an error
-        return res.status(400).json({ message: 'Like already added' });
+        // Если лайк уже существует, возвращаем ошибку
+        return res.status(400).json({ message: 'Лайк уже добавлен' });
       }
 
       const user = await User.findOne({ name: req.session.name })
 
-      // Creating a new like
+      // Создаем новый лайк
       const like = new Like({
         userId: user,
         receiptId: req.body.receiptId
       });
 
-      // Saving the like in the database
+      // Сохраняем лайк в базе данных
       await like.save();
 
-      res.status(201).json({ message: 'Like successfully added' });
+      res.status(201).json({ message: 'Лайк успешно добавлен' });
     } catch (error) {
-      console.error('Error adding like:', error);
-      res.status(500).json({ message: 'Something went wrong. Please try again.' });
+      console.error('Ошибка при добавлении лайка:', error);
+      res.status(500).json({ message: 'Что-то пошло не так. Пожалуйста, попробуйте снова.' });
     }
   }
 
@@ -146,7 +148,7 @@ class receiptController {
     })
 
     await comment_r.save()
-    res.status(200).json({ message: 'Comment successfully added' })
+    res.status(200).json({ message: 'Комментарий успешно добавлен' })
   }
 }
 

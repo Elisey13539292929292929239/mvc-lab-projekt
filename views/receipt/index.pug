@@ -51,4 +51,12 @@ html(lang="en")
       form(action='/like', method='POST')
         input(type='hidden', name='receiptId', value=receipt._id)
         button(type='submit') Like
+      br
       a(href=`/receipts/${receipt._id}`) Go to recipe page
+      if current == receipt.author
+        br
+        br
+        a(href=`/receipts/${receipt._id}/edit`) Edit recipe
+        br
+        br
+        a(href=`/receipts/${receipt._id}/delete`) Delete

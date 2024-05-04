@@ -45,10 +45,10 @@ app.get('/receipts/:id', receiptController.show);
 app.get('/receipts/:id/edit', receiptController.editForm);
 
 // Route for updating a receipt
-app.put('/receipts/:id', receiptController.update);
+app.post('/receipts/:id', receiptController.update);
 
 // Route for deleting a receipt
-app.delete('/receipts/:id', receiptController.delete);
+app.get('/receipts/:id/delete', receiptController.delete);
 
 app.post('/like', receiptController.like)
 
