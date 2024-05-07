@@ -27,8 +27,6 @@ This is a recipe management application that allows users to browse, add, edit, 
 
 ## Running the application
 
-# Application Setup Instructions
-
 To get this application running on your local machine, follow these steps:
 
 1. **Clone the repository:**
